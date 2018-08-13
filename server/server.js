@@ -12,6 +12,10 @@ var app = express();
 
 app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  res.send("Hellow World! ", process.env.MONGODB_URI);
+});
+
 app.post("/todos", (req, res) => {
   // console.log(req.body);
   var todo = new Todo({ text: req.body.text });
