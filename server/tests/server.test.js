@@ -8,55 +8,78 @@ const { Todo } = require("../models/todo");
 const { User } = require("../models/user");
 const { todos, populateTodos, users, populateUsers } = require("./seed/seed");
 
-// beforeEach(populateUsers);
+beforeEach(populateUsers);
 
 // beforeEach(populateTodos);
 
-describe("POST /user/login", () => {
-  it("should loging user and return auth token", done => {
+describe("DELETE /users/me/token", () => {
+  it("should remove auth token on logout", done => {
     request(app)
-      .post("/users/loing")
-      .send({ email: users[1].email, password: users[1].password })
+      .delete("/users/me/token")
+      // .set(
+      //   "x-auth",
+      //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Yjc1OGQ4ZDk3MmI5ZTQ3NjQyZDY0ZWYiLCJhY2Nlc3MiOiJhdXRoIiwiaWF0IjoxNTM0NDMwNjA1fQ.UjXm5VYFpW1ESVKDxHdsxAouqgmwpH5iS7nNVdY23fU"
+      // )
+      .set("x-auth", users[0].tokens[0].token)
       .expect(200)
-      .expect(res => {
-        expect(res.header["x-auth"]).toExist();
-      })
-      .end((err, res) => {
-        if (err) return done(err);
-
-        User.findById(users[1]._id)
-          .then(user => {
-            expect(user.tokens[0]).toInclude({
-              access: "auth",
-              token: res.header["x-auth"]
-            });
-            done();
-          })
-          .catch(e => done(e));
-      });
-  });
-
-  it("should reject invalid login", done => {
-    request(app)
-      .post("/user/login")
-      .send({ email: "usman@mail.com", password: "abc" })
-      .expect(400)
-      .expect(res => {
-        expect(res.header["x-auth"]).toNotExist();
-      })
       .end((err, res) => {
         if (err) done(err);
 
-        User.findOne({ email: "usman@mail.com" })
+        User.findById(users[0]._id)
           .then(user => {
             expect(user.tokens.length).toBe(0);
             done();
           })
           .catch(e => done(e));
       });
-    // done();
   });
 });
+
+// describe("POST /user/login", () => {
+//   it("should loging user and return auth token", done => {
+//     request(app)
+//       .post("/users/loing")
+//       .send({ email: users[1].email, password: users[1].password })
+//       .expect(200)
+//       .expect(res => {
+//         expect(res.header["x-auth"]).toExist();
+//       })
+//       .end((err, res) => {
+//         if (err) return done(err);
+
+//         User.findById(users[1]._id)
+//           .then(user => {
+//             expect(user.tokens[0]).toInclude({
+//               access: "auth",
+//               token: res.header["x-auth"]
+//             });
+//             done();
+//           })
+//           .catch(e => done(e));
+//       });
+//   });
+
+//   it("should reject invalid login", done => {
+//     request(app)
+//       .post("/user/login")
+//       .send({ email: "usman@mail.com", password: "abc" })
+//       .expect(400)
+//       .expect(res => {
+//         expect(res.header["x-auth"]).toNotExist();
+//       })
+//       .end((err, res) => {
+//         if (err) done(err);
+
+//         User.findOne({ email: "usman@mail.com" })
+//           .then(user => {
+//             expect(user.tokens.length).toBe(0);
+//             done();
+//           })
+//           .catch(e => done(e));
+//       });
+//     // done();
+//   });
+// });
 
 // describe("GET /users/me", () => {
 //   // it("should return a user if authenticated", done => {
