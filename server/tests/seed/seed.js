@@ -40,7 +40,7 @@ const populateTodos = done => {
     .catch(e => done("error occored in before each ", e));
 };
 
-populateTodos();
+// populateTodos();
 
 const populateUsers = done => {
   User.remove({})
